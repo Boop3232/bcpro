@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Body Calculator Pro</title>
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #212529;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .navbar-brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+            margin: 0;
+        }
+        .navbar-menu a {
+            text-decoration: none;
+            color: #212529;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        .navbar-menu a:hover {
+            color: #007bff;
+        }
+        .navbar-menu a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #007bff;
+            transition: width 0.3s ease;
+        }
+        .navbar-menu a:hover::after {
+            width: 100%;
+        }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+            padding: 8px;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #212529;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 70px; left: 0; right: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            transform: translateY(-100%);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        .mobile-menu ul {
+            list-style: none;
+            padding: 20px;
+            margin: 0;
+        }
+        .mobile-menu li {
+            margin-bottom: 15px;
+        }
+        .mobile-menu a {
+            display: block;
+            text-decoration: none;
+            color: #212529;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .mobile-menu a:hover {
+            background: rgba(0,123,255,0.1);
+            color: #007bff;
+        }
+
+        /* Responsive Navbar */
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+            }
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f7f7f9 0%, #ffffff 100%);
+            padding: 150px 0 100px;
+            text-align: center;
+            animation: fadeInUp 1s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: #6c757d;
+            margin: 0;
+        }
+        .app-badges {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .app-badge {
+            display: inline-block;
+            height: 60px;
+            transition: transform 0.2s ease;
+        }
+        .app-badge:hover {
+            transform: scale(1.05);
+        }
+        .app-badge img {
+            height: 100%;
+            border-radius: 8px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            text-align: center;
+            background: #ffffff;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #212529;
+        }
+        .section-subtitle {
+            color: #6c757d;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .feature-box {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: left;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        .feature-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .feature-box h5 {
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #212529;
+        }
+        .feature-box p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        /* Screenshots Section */
+        .screenshots-section {
+            padding: 80px 20px;
+            background: #ffffff;
+            text-align: center;
+            color: #1d1d1f;
+            min-height: 120vh;
+            position: relative;
+            overflow: hidden;
+        }
+        .screenshots-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .screenshots-section .subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+        }
+        .screenshots-hero-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            height: auto;
+            min-height: 800px;
+        }
+        .hero-phone {
+            width: 320px;
+            height: 640px;
+            background: #fff;
+            border-radius: 30px;
+            padding: 15px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 10;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+        .hero-phone:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+            opacity: 1;
+        }
+        .hero-phone img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+        .side-phones-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .side-phone {
+            width: 200px;
+            height: 400px;
+            background: #fff;
+            border-radius: 25px;
+            padding: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            opacity: 0.4;
+        }
+        .side-phone:hover {
+            transform: translateY(-8px) scale(1.05);
+            opacity: 1;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+        .side-phone img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+        }
+
+        /* Mobile Screenshots Gallery */
+        .mobile-screenshots-container {
+            display: none;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 20px 0;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mobile-screenshots-wrapper {
+            display: flex;
+            gap: 20px;
+            padding: 0 20px;
+            min-width: max-content;
+        }
+        .mobile-screenshot-item {
+            flex-shrink: 0;
+            scroll-snap-align: center;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            width: 240px;
+            height: 480px;
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        .mobile-screenshot-item.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .mobile-screenshot-phone {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 25px;
+            padding: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        .mobile-screenshot-phone img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 18px;
+        }
+        .mobile-screenshots-container::-webkit-scrollbar {
+            display: none;
+        }
+        .mobile-screenshots-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .mobile-scroll-indicators {
+            display: none;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .scroll-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .scroll-dot.active {
+            background: #007bff;
+            transform: scale(1.2);
+        }
+
+        /* Responsive Features and Screenshots */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .screenshots-grid {
+                grid-template-columns: 1fr;
+            }
+            .screenshots-section {
+                padding: 60px 0;
+                min-height: auto;
+            }
+            .screenshots-section h2 {
+                font-size: 2rem;
+                margin-bottom: 0.8rem;
+            }
+            .screenshots-section .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+            .screenshots-hero-container {
+                display: none;
+            }
+            .mobile-screenshots-container {
+                display: block;
+            }
+            .mobile-scroll-indicators {
+                display: flex;
+            }
+        }
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CUSTOM NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                <img src="bcp logo.png" alt="Logo" />
+                Body Calculator
+            </a>
+            <ul class="navbar-menu">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#screenshots">Screenshots</a></li>
+                <li><a href="#">Privacy</a></li>
+                <li><a href="#">Download</a></li>
+                <li><a href="#">Support</a></li>
+            </ul>
+            <div class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="#features" onclick="closeMobileMenu()">Features</a></li>
+            <li><a href="#screenshots" onclick="closeMobileMenu()">Screenshots</a></li>
+            <li><a href="#" onclick="closeMobileMenu()">Privacy</a></li>
+            <li><a href="#" onclick="closeMobileMenu()">Download</a></li>
+            <li><a href="#" onclick="closeMobileMenu()">Support</a></li>
+        </ul>
+    </div>
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <div class="container">
+            <h1>Body Calculator Pro</h1>
+            <p>Transform your health journey with precision.</p>
+            <div class="app-badges">
+                <a href="https://play.google.com/store/apps/details?id=com.musharrafraza.bodycalculator&pcampaignid=web_share"
+                     class="app-badge" target="_blank" rel="noopener">
+                    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                             alt="Get it on Google Play">
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- FEATURES SECTION -->
+    <div id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Powerful. Precise. Private.</h2>
+            <p class="section-subtitle">Advanced body composition analysis that respects your privacy.</p>
+            <div class="features-grid">
+                <div class="feature-box">
+                    <h5>BMI Calculator</h5>
+                    <p>WHO standard BMI calculations with comprehensive health categories and personalized insights.</p>
+                </div>
+                <div class="feature-box">
+                    <h5>Body Fat Analysis</h5>
+                    <p>Accurate body fat percentage calculations using scientifically validated formulas.</p>
+                </div>
+                <div class="feature-box">
+                    <h5>Muscle Mass Tracking</h5>
+                    <p>Monitor muscle mass and lean body weight to optimize your fitness journey.</p>
+                </div>
+                <div class="feature-box">
+                    <h5>Privacy First</h5>
+                    <p>All data stays on your device. No cloud storage, no tracking, complete privacy.</p>
+                </div>
+                <div class="feature-box">
+                    <h5>GDPR Compliant</h5>
+                    <p>Full privacy controls with easy consent management and data transparency.</p>
+                </div>
+                <div class="feature-box">
+                    <h5>Offline Ready</h5>
+                    <p>Works completely offline. No internet required for calculations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section class="screenshots-section" id="screenshots">
+        <h2 data-aos="fade-up">See It in Action</h2>
+        <p class="subtitle" data-aos="fade-up" data-aos-delay="100">Beautiful interface. Powerful calculations. Private by design.</p>
+        <!-- Desktop: Hero Screenshot Display -->
+        <div class="screenshots-hero-container">
+            <!-- Left Side Phones -->
+            <div class="side-phones-container">
+                <div class="side-phone" id="sidePhone1" data-aos="fade-up" data-aos-delay="200">
+                    <img src="screenshots/image2.jpeg" alt="Body Calculator Pro - Body Fat Analysis Screen" />
+                </div>
+                <div class="side-phone" id="sidePhone2" data-aos="fade-up" data-aos-delay="200">
+                    <img src="screenshots/image3.jpeg" alt="Body Calculator Pro - Results Screen" />
+                </div>
+            </div>
+            <!-- Main Hero Phone - Center Large Screenshot -->
+            <div class="hero-phone" id="heroPhone" data-aos="fade-up" data-aos-delay="200">
+                <img src="screenshots/image1.jpeg" alt="Body Calculator Pro - Main Screen" />
+            </div>
+            <!-- Right Side Phones -->
+            <div class="side-phones-container">
+                <div class="side-phone" id="sidePhone3" data-aos="fade-up" data-aos-delay="200">
+                    <img src="screenshots/image4.jpeg" alt="Body Calculator Pro - Settings Screen" />
+                </div>
+                <div class="side-phone" id="sidePhone4" data-aos="fade-up" data-aos-delay="200">
+                    <img src="screenshots/image5.jpeg" alt="Body Calculator Pro - Information Screen" />
+                </div>
+            </div>
+        </div>
+        <!-- Mobile: Horizontal Scrolling Gallery -->
+        <div class="mobile-screenshots-container">
+            <div class="mobile-screenshots-wrapper">
+                <div class="mobile-screenshot-item">
+                    <div class="mobile-screenshot-phone">
+                        <img src="screenshots/image2.jpeg" alt="Body Calculator Pro - Body Fat Analysis Screen" />
+                    </div>
+                </div>
+                <div class="mobile-screenshot-item">
+                    <div class="mobile-screenshot-phone">
+                        <img src="screenshots/image1.jpeg" alt="Body Calculator Pro - Main Screen" />
+                    </div>
+                </div>
+                <div class="mobile-screenshot-item">
+                    <div class="mobile-screenshot-phone">
+                        <img src="screenshots/image3.jpeg" alt="Body Calculator Pro - Results Screen" />
+                    </div>
+                </div>
+                <div class="mobile-screenshot-item">
+                    <div class="mobile-screenshot-phone">
+                        <img src="screenshots/image4.jpeg" alt="Body Calculator Pro - Settings Screen" />
+                    </div>
+                </div>
+                <div class="mobile-screenshot-item">
+                    <div class="mobile-screenshot-phone">
+                        <img src="screenshots/image5.jpeg" alt="Body Calculator Pro - Information Screen" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Scroll Indicators -->
+        <div class="mobile-scroll-indicators">
+            <div class="scroll-dot active"></div>
+            <div class="scroll-dot"></div>
+            <div class="scroll-dot"></div>
+            <div class="scroll-dot"></div>
+            <div class="scroll-dot"></div>
+        </div>
+    </section>
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 800, once: false });
+
+    function toggleMobileMenu() {
+        const hamburger = document.querySelector('.hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        hamburger.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    }
+
+    function closeMobileMenu() {
+        const hamburger = document.querySelector('.hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        hamburger.classList.remove('active');
+        mobileMenu.classList.remove('active');
+    }
+
+    function updateScrollIndicators() {
+        const container = document.querySelector('.mobile-screenshots-container');
+        const dots = document.querySelectorAll('.scroll-dot');
+        const items = document.querySelectorAll('.mobile-screenshot-item');
+        if (!container || !dots.length || !items.length) return;
+        const containerCenter = container.scrollLeft + container.offsetWidth / 2;
+        let closestIndex = 0, closestDistance = Infinity;
+        items.forEach((item, index) => {
+            const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+            const distance = Math.abs(itemCenter - containerCenter);
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = index;
+            }
+        });
+        items.forEach((item, index) => {
+            item.classList.toggle('active', index === closestIndex);
+        });
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === closestIndex);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.querySelector('.mobile-screenshots-container');
+        const dots = document.querySelectorAll('.scroll-dot');
+        const items = document.querySelectorAll('.mobile-screenshot-item');
+
+        // Highlight the first screenshot and dot initially
+        if (items.length) items[0].classList.add('active');
+        if (dots.length) dots[0].classList.add('active');
+
+        if (container) {
+            container.addEventListener('scroll', updateScrollIndicators);
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    const itemWidth = 260; // Approx width + gap
+                    container.scrollTo({
+                        left: index * itemWidth,
+                        behavior: 'smooth'
+                    });
+
+                    // Highlight after scroll
+                    items.forEach((item, i) => {
+                        item.classList.toggle('active', i === index);
+                    });
+                    dots.forEach((dotEl, i) => {
+                        dotEl.classList.toggle('active', i === index);
+                    });
+                });
+            });
+        }
+    });
+
+    document.addEventListener('click', function (event) {
+        const navbar = document.querySelector('.navbar');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (!navbar.contains(event.target) && !mobileMenu.contains(event.target)) {
+            closeMobileMenu();
+        }
+    });
+</script>
+
+</body>
+</html>
